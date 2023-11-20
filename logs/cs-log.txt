@@ -1,0 +1,13 @@
+[2023-11-20 16:59:58] 5001 enters critical section.
+[2023-11-20 17:00:02] 5001 leaves critical section.
+[2023-11-20 17:00:02] 5000 enters critical section.
+[2023-11-20 17:00:04] 5000 leaves critical section.
+[2023-11-20 17:00:04] 5002 enters critical section.
+[2023-11-20 17:00:04] 5002 leaves critical section.
+[2023-11-20 17:00:05] 5002 enters critical section.
+[2023-11-20 17:00:08] 5002 leaves critical section.
+[2023-11-20 17:00:11] 5000 enters critical section.
+[2023-11-20 17:00:15] 5000 leaves critical section.
+[2023-11-20 17:00:15] 5001 enters critical section.
+[2023-11-20 17:00:19] 5001 leaves critical section.
+[2023-11-20 17:00:19] 5002 enters critical section.

@@ -14,4 +14,4 @@ BSDISYS1KU-20222, mandatory handin 4
 It is hardcoded for 3 peers with port 5000, 5001 and 5002. 
 
 
-3. A peer will create a log.txt in the root directory under the name `peer(*)-log.txt`, with `*` being the bound port.
+2. A peer will create a log.txt in the root directory under the name `logs/peer(*)-log.txt`, with `*` being the bound port. Peers log their actions and logical timestamps. The critical section is present seperate log in `logs/cs-log.txt`. 

@@ -16,6 +16,11 @@ import (
 	"google.golang.org/grpc"
 )
 
+type msg struct {
+	id      int32
+	lamport int32
+}
+
 type peer struct {
 	message.UnimplementedServiceServer
 	id      int32
@@ -25,7 +30,7 @@ type peer struct {
 	state   string
 	lamport int32
 	// a slice
-	queue []message.Info
+	queue []msg
 	// Update on this channel, when when messages should be dequeued
 	reply   chan bool
 	clients map[int32]message.ServiceClient
@@ -56,7 +61,7 @@ func main() {
 		log.Fatalf("Could not listen on port: %v", err)
 	}
 
-	f := setLog(ownPort)
+	f, cs := setLog(ownPort)
 	defer f.Close()
 
 	grpcServer := grpc.NewServer()
@@ -97,9 +102,9 @@ func main() {
 			<-p.reply
 			p.mutex.Lock()
 			for _, msg := range p.queue {
-				p.lamport = max(msg.Lamport, p.lamport) + 1
-				log.Printf("(%v, %v) Send | Allowing %v to enter critical section (queue release) \n", p.id, p.lamport, msg.Id)
-				p.clients[msg.Id].Reply(p.ctx, &message.Info{Id: p.id})
+				p.lamport = max(msg.lamport, p.lamport) + 1
+				log.Printf("(%v, %v) Send | Allowing %v to enter critical section (queue release) \n", p.id, p.lamport, msg.id)
+				p.clients[msg.id].Reply(p.ctx, &message.Info{Id: p.id})
 			}
 			p.queue = nil
 			p.state = "RELEASED"
@@ -108,24 +113,29 @@ func main() {
 	}()
 
 	rand.Seed(time.Now().UnixNano() / int64(ownPort))
-	// for {
-	// 	// 1/100 chance to want access
-	// 	if rand.Intn(100) == 1 {
-	// 		p.mutex.Lock()
-	// 		p.state = "WANTED"
-	// 		p.mutex.Unlock()
-	// 		p.enter()
-	// 		// wait for state to be held
-	// 		<-p.held
-	// 		p.lamport++
-	// 		log.Printf("(%v, %v) Internal | Entered critical section\n", p.id, p.lamport)
-	// 		time.Sleep(5 * time.Second)
-	// 		p.lamport++
-	// 		log.Printf("(%v, %v) Internal | Leaving critical section\n", p.id, p.lamport)
-	// 		p.reply <- true
-	// 	}
-	// 	time.Sleep(50 * time.Millisecond)
-	// }
+	for {
+		// 1/100 chance to want access
+		if rand.Intn(100) == 1 {
+			p.mutex.Lock()
+			p.state = "WANTED"
+			p.mutex.Unlock()
+			p.enter()
+			// wait for state to be held
+			<-p.held
+			p.lamport++
+			log.Printf("(%v, %v) Internal | Enters critical section\n", p.id, p.lamport)
+			writeToFile(cs, p.id, "enters critical section.")
+			var random = rand.Intn(5)
+			time.Sleep(time.Duration(random) * time.Second)
+			p.lamport++
+			log.Printf("(%v, %v) Internal | Leaves critical section\n", p.id, p.lamport)
+			writeToFile(cs, p.id, "leaves critical section.")
+			p.reply <- true
+			time.Sleep(100 * time.Millisecond)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+
 	for {
 		p.mutex.Lock()
 		p.state = "WANTED"
@@ -135,26 +145,38 @@ func main() {
 		<-p.held
 		p.lamport++
 		log.Printf("(%v, %v) Internal | Entered critical section\n", p.id, p.lamport)
-		time.Sleep(5 * time.Second)
+		writeToFile(cs, p.id, "enters critical section.")
+		var random = rand.Intn(5)
+		time.Sleep(time.Duration(random) * time.Second)
 		p.lamport++
 		log.Printf("(%v, %v) Internal | Leaving critical section\n", p.id, p.lamport)
+		writeToFile(cs, p.id, "leaves critical section.")
 		p.reply <- true
+		time.Sleep(100 * time.Millisecond)
 	}
+
 }
 
 func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, error) {
 	p.mutex.Lock()
-	p.lamport = max(req.Lamport, p.lamport) + 1
+
 	if p.state == "HELD" || (p.state == "WANTED" && ((p.lamport < req.Lamport) || (p.lamport == req.Lamport && p.id < req.Id))) {
+		p.lamport = max(req.Lamport, p.lamport) + 1
 		log.Printf("(%v, %v) Recv | queueing request from %v\n", p.id, p.lamport, req.Id)
-		p.queue = append(p.queue, *req)
+
+		p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})
 	} else {
 
 		go func() {
+
+			p.mutex.Lock()
 			time.Sleep(10 * time.Millisecond)
 			p.lamport++
+			p.replies = 0
 			log.Printf("(%v, %v) Send | Allowing %v to enter critical section\n", p.id, p.lamport, req.Id)
-			p.clients[req.Id].Reply(p.ctx, &message.Info{Id: p.id, Lamport: p.lamport})
+			p.clients[req.Id].Reply(p.ctx, &message.Info{Id: p.id, Lamport: p.lamport, State: p.state})
+			p.mutex.Unlock()
+
 		}()
 	}
 
@@ -163,9 +185,16 @@ func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, 
 }
 
 func (p *peer) Reply(ctx context.Context, req *message.Info) (*message.Empty, error) {
+	p.mutex.Lock()
 	p.lamport = max(p.lamport, req.Lamport) + 1
 	log.Printf("(%v, %v) Recv | Got reply from id %v\n", p.id, p.lamport, req.Id)
-	p.mutex.Lock()
+
+	// Added this check in case a the peer responded but that peer itself is in wanted state.
+	// For this case, the responding peer that won access enqueues the request and responds when it is done,
+	// since requests are only issued once the peer that lost will eventually get it when it is released from the queue.
+	if req.State == "WANTED" {
+		p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})
+	}
 	p.replies++
 	if p.replies >= 2 {
 		p.state = "HELD"
@@ -183,7 +212,7 @@ func (p *peer) enter() {
 	for id, client := range p.clients {
 		p.lamport++
 		log.Printf("(%v, %v) Send | Seeking critical section access", p.id, p.lamport)
-		info := &message.Info{Id: p.id, Lamport: p.lamport}
+		info := &message.Info{Id: p.id, Lamport: p.lamport, State: p.state}
 		_, err := client.Request(p.ctx, info)
 		if err != nil {
 			log.Printf("something went wrong with id %v\n", id)
@@ -199,7 +228,15 @@ func max(a int32, b int32) int32 {
 	}
 }
 
-func setLog(port int32) *os.File {
+func writeToFile(logFile *os.File, id int32, message string) {
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	_, err := fmt.Fprintf(logFile, "[%s] %v %s\n", timestamp, id, message)
+	if err != nil {
+		log.Printf("Failed to write to critical section log: %v", err)
+	}
+}
+
+func setLog(port int32) (*os.File, *os.File) {
 	// Clears the log.txt file when a new server is started
 	filename := fmt.Sprintf("logs/peer(%v)-log.txt", port)
 	if err := os.Truncate(filename, 0); err != nil {
@@ -215,5 +252,11 @@ func setLog(port int32) *os.File {
 	mw := io.MultiWriter(os.Stdout, f)
 	log.SetFlags(0)
 	log.SetOutput(mw)
-	return f
+
+	cslog, err := os.OpenFile("logs/cs-log.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0666)
+	if err != nil {
+		log.Fatalf("Error opening critical section log file: %v", err)
+	}
+
+	return f, cslog
 }
