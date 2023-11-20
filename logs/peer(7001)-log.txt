@@ -1,0 +1,33 @@
+2022/11/14 22:26:08 Attempting dial: 7000
+2022/11/14 22:26:08 Attempting dial: 7002
+2022/11/14 22:26:09 Connected to all clients :) Sleeping to allow them to dial to us aswell
+2022/11/14 22:26:15 Enter | Seeking critical section access
+2022/11/14 22:26:15 Enter | Requested from 7000
+2022/11/14 22:26:15 Enter | Requested from 7002
+2022/11/14 22:26:15 Reply | Got reply from id 7002
+2022/11/14 22:26:15 Reply | Got reply from id 7000
+2022/11/14 22:26:15 + Entered critical section
+2022/11/14 22:26:15 Request | Received request from 7002, appending...
+2022/11/14 22:26:20 - Leaving critical section
+2022/11/14 22:26:20 Queue | Giving permission to enter critical section to 7002
+2022/11/14 22:26:24 Enter | Seeking critical section access
+2022/11/14 22:26:24 Enter | Requested from 7002
+2022/11/14 22:26:24 Enter | Requested from 7000
+2022/11/14 22:26:24 Reply | Got reply from id 7000
+2022/11/14 22:26:25 Reply | Got reply from id 7002
+2022/11/14 22:26:25 + Entered critical section
+2022/11/14 22:26:27 Request | Received request from 7002, appending...
+2022/11/14 22:26:27 Request | Received request from 7000, appending...
+2022/11/14 22:26:30 - Leaving critical section
+2022/11/14 22:26:30 Queue | Giving permission to enter critical section to 7002
+2022/11/14 22:26:30 Queue | Giving permission to enter critical section to 7000
+2022/11/14 22:26:35 Enter | Seeking critical section access
+2022/11/14 22:26:35 Enter | Requested from 7000
+2022/11/14 22:26:35 Enter | Requested from 7002
+2022/11/14 22:26:35 Reply | Got reply from id 7002
+2022/11/14 22:26:37 Request | Received request from 7002, appending...
+2022/11/14 22:26:40 Reply | Got reply from id 7000
+2022/11/14 22:26:40 + Entered critical section
+2022/11/14 22:26:45 - Leaving critical section
+2022/11/14 22:26:45 Queue | Giving permission to enter critical section to 7002
+2022/11/14 22:26:47 Request | Allowing 7000 to enter critical section

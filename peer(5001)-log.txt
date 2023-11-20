@@ -1,0 +1,14 @@
+2023/11/20 10:44:34 Attempting dial: 5000
+2023/11/20 10:44:34 Attempting dial: 5002
+2023/11/20 10:44:42 Connected to all clients, sleeping 
+2023/11/20 10:44:47 Request | Allowing 5002 to enter critical section
+2023/11/20 10:44:50 Request | Allowing 5000 to enter critical section
+2023/11/20 10:44:58 Enter | Seeking critical section access
+2023/11/20 10:44:58 Enter | Requested from 5000
+2023/11/20 10:44:58 Enter | Requested from 5002
+2023/11/20 10:44:58 Reply | Got reply from id 5002
+2023/11/20 10:44:58 Reply | Got reply from id 5000
+2023/11/20 10:44:58 + Entered critical section
+2023/11/20 10:45:02 Request | Received request from 5002, appending...
+2023/11/20 10:45:03 - Leaving critical section
+2023/11/20 10:45:03 Queue | Giving permission to enter critical section to 5002

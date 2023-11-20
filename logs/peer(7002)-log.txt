@@ -1,0 +1,30 @@
+2022/11/14 22:26:09 Attempting dial: 7000
+2022/11/14 22:26:09 Attempting dial: 7001
+2022/11/14 22:26:09 Connected to all clients :) Sleeping to allow them to dial to us aswell
+2022/11/14 22:26:15 Request | Allowing 7001 to enter critical section
+2022/11/14 22:26:15 Enter | Seeking critical section access
+2022/11/14 22:26:15 Enter | Requested from 7000
+2022/11/14 22:26:15 Enter | Requested from 7001
+2022/11/14 22:26:15 Reply | Got reply from id 7000
+2022/11/14 22:26:20 Reply | Got reply from id 7001
+2022/11/14 22:26:20 + Entered critical section
+2022/11/14 22:26:24 Request | Received request from 7001, appending...
+2022/11/14 22:26:25 - Leaving critical section
+2022/11/14 22:26:25 Queue | Giving permission to enter critical section to 7001
+2022/11/14 22:26:27 Enter | Seeking critical section access
+2022/11/14 22:26:27 Enter | Requested from 7000
+2022/11/14 22:26:27 Enter | Requested from 7001
+2022/11/14 22:26:27 Reply | Got reply from id 7000
+2022/11/14 22:26:27 Request | Received request from 7000, appending...
+2022/11/14 22:26:30 Reply | Got reply from id 7001
+2022/11/14 22:26:30 + Entered critical section
+2022/11/14 22:26:35 - Leaving critical section
+2022/11/14 22:26:35 Queue | Giving permission to enter critical section to 7000
+2022/11/14 22:26:35 Request | Allowing 7001 to enter critical section
+2022/11/14 22:26:37 Enter | Seeking critical section access
+2022/11/14 22:26:37 Enter | Requested from 7000
+2022/11/14 22:26:37 Enter | Requested from 7001
+2022/11/14 22:26:40 Reply | Got reply from id 7000
+2022/11/14 22:26:45 Reply | Got reply from id 7001
+2022/11/14 22:26:45 + Entered critical section
+2022/11/14 22:26:47 Request | Received request from 7000, appending...

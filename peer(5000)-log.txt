@@ -1,0 +1,13 @@
+2023/11/20 10:44:28 Attempting dial: 5001
+2023/11/20 10:44:34 Attempting dial: 5002
+2023/11/20 10:44:42 Connected to all clients, sleeping 
+2023/11/20 10:44:47 Request | Allowing 5002 to enter critical section
+2023/11/20 10:44:50 Enter | Seeking critical section access
+2023/11/20 10:44:50 Enter | Requested from 5001
+2023/11/20 10:44:50 Enter | Requested from 5002
+2023/11/20 10:44:50 Reply | Got reply from id 5001
+2023/11/20 10:44:52 Reply | Got reply from id 5002
+2023/11/20 10:44:52 + Entered critical section
+2023/11/20 10:44:57 - Leaving critical section
+2023/11/20 10:44:58 Request | Allowing 5001 to enter critical section
+2023/11/20 10:45:02 Request | Allowing 5002 to enter critical section
