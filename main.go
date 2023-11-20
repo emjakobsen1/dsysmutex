@@ -106,11 +106,12 @@ func main() {
 			<-p.reply
 			p.mutex.Lock()
 			for _, msg := range p.queue {
-				p.lamport = max(msg.lamport, p.lamport) + 1
+				p.lamport = max(msg.lamport, p.lamport)
 				p.replies[msg.id] = false
 				log.Printf("(%v, %v) Send | Allowing %v to enter critical section (queue release) \n", p.id, p.lamport, msg.id)
 				p.clients[msg.id].Reply(p.ctx, &message.Info{Id: p.id})
 			}
+			p.lamport++
 			p.queue = nil
 			p.state = "RELEASED"
 			p.mutex.Unlock()
@@ -182,7 +183,7 @@ func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, 
 			//p.lamport++
 			p.replies[req.Id] = false
 			log.Printf("(%v, %v) Send | Allowing %v to enter critical section\n", p.id, p.lamport, req.Id)
-			p.clients[req.Id].Reply(p.ctx, &message.Info{Id: p.id, Lamport: p.lamport, State: p.state})
+			p.clients[req.Id].Reply(p.ctx, &message.Info{Id: p.id, State: p.state})
 			p.mutex.Unlock()
 
 		}()
