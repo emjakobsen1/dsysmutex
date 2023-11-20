@@ -16,7 +16,7 @@ service Service
 
 message Info {
     int32 id = 1;
-    uint64 lamport = 2;
+    int32 lamport = 2;
 }
 
 message Id {
