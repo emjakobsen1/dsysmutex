@@ -201,7 +201,7 @@ func max(a int32, b int32) int32 {
 
 func setLog(port int32) *os.File {
 	// Clears the log.txt file when a new server is started
-	filename := fmt.Sprintf("peer(%v)-log.txt", port)
+	filename := fmt.Sprintf("logs/peer(%v)-log.txt", port)
 	if err := os.Truncate(filename, 0); err != nil {
 		log.Printf("Failed to truncate: %v\n", err)
 	}
