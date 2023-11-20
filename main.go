@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	ricart "github.com/emjakobsen1/dsysmutex/proto"
+	message "github.com/emjakobsen1/dsysmutex/proto"
 	"google.golang.org/grpc"
 )
 
@@ -22,7 +22,7 @@ type msg struct {
 }
 
 type peer struct {
-	ricart.UnimplementedServiceServer
+	message.UnimplementedServiceServer
 	id      int32
 	mutex   sync.Mutex
 	replies int32
@@ -30,15 +30,15 @@ type peer struct {
 	state   string
 	lamport int32
 	// some gRPC calls use empty, prevent making a new one each time
-	empty ricart.Empty
+	empty message.Empty
 	// same as above, except for replies
-	idmsg ricart.Id
+	idmsg message.Id
 	// queued "messages" get appended here, FIFO, in actuality we just store the id of the
 	// peer instance we wish to 'gRPC.Reply' to, and the lamport timestamp for updating own lamport
 	queue []msg
 	// fire update on this channel, when we need to send messages in our queue
 	reply   chan bool
-	clients map[int32]ricart.ServiceClient
+	clients map[int32]message.ServiceClient
 	ctx     context.Context
 }
 
@@ -51,14 +51,14 @@ func main() {
 
 	p := &peer{
 		id:      ownPort,
-		clients: make(map[int32]ricart.ServiceClient),
+		clients: make(map[int32]message.ServiceClient),
 		replies: 0,
 		held:    make(chan bool),
 		ctx:     ctx,
 		state:   "RELEASED",
-		lamport: 1,
-		empty:   ricart.Empty{},
-		idmsg:   ricart.Id{Id: ownPort},
+		lamport: 0,
+		empty:   message.Empty{},
+		idmsg:   message.Id{Id: ownPort},
 		reply:   make(chan bool),
 	}
 
@@ -72,7 +72,7 @@ func main() {
 	defer f.Close()
 
 	grpcServer := grpc.NewServer()
-	ricart.RegisterServiceServer(grpcServer, p)
+	message.RegisterServiceServer(grpcServer, p)
 
 	go func() {
 		if err := grpcServer.Serve(list); err != nil {
@@ -95,11 +95,11 @@ func main() {
 			log.Fatalf("Dial failed: %s", err)
 		}
 		defer conn.Close()
-		c := ricart.NewServiceClient(conn)
+		c := message.NewServiceClient(conn)
 		p.clients[port] = c
 	}
 
-	log.Printf("Connected to all clients, sleeping \n")
+	log.Printf("Connected to all clients\n")
 	// as seen from log message above - this is because if we do not sleep, then the first (or second) client will cause
 	// invalid control flow in the different gRPC functions on last client, since it might not have an active connection to the one dialing it yet
 	// - the simplest solution, is to just wait a little, rather than inquiring each client about whether or not it has N-clients dialed, like ourselves
@@ -113,9 +113,7 @@ func main() {
 			p.mutex.Lock()
 			for _, msg := range p.queue {
 				// update our lamport to the max found value in queue
-				if msg.lamport > p.lamport {
-					p.lamport = msg.lamport
-				}
+				p.lamport = max(msg.lamport, p.lamport)
 				log.Printf("Queue | Giving permission to enter critical section to %v\n", msg.id)
 				p.clients[msg.id].Reply(p.ctx, &p.idmsg)
 			}
@@ -149,7 +147,7 @@ func main() {
 	}
 }
 
-func (p *peer) Request(ctx context.Context, req *ricart.Info) (*ricart.Empty, error) {
+func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, error) {
 	p.mutex.Lock()
 	if p.state == "HELD" || (p.state == "WANTED" && ((p.lamport < req.Lamport) || (p.lamport == req.Lamport && p.id < req.Id))) {
 		log.Printf("Request | Received request from %v, appending...\n", req.Id)
@@ -162,7 +160,7 @@ func (p *peer) Request(ctx context.Context, req *ricart.Info) (*ricart.Empty, er
 		// to *only* count amount of replies we've received to know whether or not we can enter critical section
 		go func() {
 			time.Sleep(10 * time.Millisecond)
-			log.Printf("Request | Allowing %v to enter critical section\n", req.Id)
+			log.Printf("(%v, %v) Request | Allowing %v to enter critical section\n", p.id, p.lamport, req.Id)
 			p.clients[req.Id].Reply(p.ctx, &p.idmsg)
 		}()
 	}
@@ -171,8 +169,8 @@ func (p *peer) Request(ctx context.Context, req *ricart.Info) (*ricart.Empty, er
 	return &p.empty, nil
 }
 
-func (p *peer) Reply(ctx context.Context, req *ricart.Id) (*ricart.Empty, error) {
-	log.Printf("Reply | Got reply from id %v\n", req.Id)
+func (p *peer) Reply(ctx context.Context, req *message.Id) (*message.Empty, error) {
+	log.Printf("(%v, %v) Reply | Got reply from id %v\n", p.id, p.lamport, req.Id)
 	p.mutex.Lock()
 	p.replies++
 	if p.replies >= 2 {
@@ -189,7 +187,7 @@ func (p *peer) Reply(ctx context.Context, req *ricart.Id) (*ricart.Empty, error)
 
 func (p *peer) enter() {
 	log.Printf("Enter | Seeking critical section access")
-	info := &ricart.Info{Id: p.id, Lamport: p.lamport}
+	info := &message.Info{Id: p.id, Lamport: p.lamport}
 	for id, client := range p.clients {
 		_, err := client.Request(p.ctx, info)
 		if err != nil {
