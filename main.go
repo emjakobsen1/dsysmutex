@@ -18,7 +18,7 @@ import (
 
 type msg struct {
 	id      int32
-	lamport uint64
+	lamport int32
 }
 
 type peer struct {
@@ -28,7 +28,7 @@ type peer struct {
 	replies int32
 	held    chan bool
 	state   string
-	lamport uint64
+	lamport int32
 	// some gRPC calls use empty, prevent making a new one each time
 	empty ricart.Empty
 	// same as above, except for replies
@@ -139,9 +139,9 @@ func main() {
 			p.enter()
 			// wait for state to be held
 			<-p.held
-			log.Printf("+ Entered critical section\n")
+			log.Printf("(%v, %v) + Entered critical section\n", p.id, p.lamport)
 			time.Sleep(5 * time.Second)
-			log.Printf("- Leaving critical section\n")
+			log.Printf("(%v, %v) - Leaving critical section\n", p.id, p.lamport)
 			// fire all of our queued replies, this also sets our state back to released
 			p.reply <- true
 		}
@@ -155,10 +155,7 @@ func (p *peer) Request(ctx context.Context, req *ricart.Info) (*ricart.Empty, er
 		log.Printf("Request | Received request from %v, appending...\n", req.Id)
 		p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})
 	} else {
-		if req.Lamport > p.lamport {
-			p.lamport = req.Lamport
-		}
-		p.lamport++
+		p.lamport = max(req.Lamport, p.lamport) + 1
 		// we need the reply to arrive later than request finishing up, which is messy
 		// reply/request could instead have been combined, and then depending on value - the peer
 		// would know whether or not a request succeeded... however, this simplifies logic, since it allows
@@ -169,6 +166,7 @@ func (p *peer) Request(ctx context.Context, req *ricart.Info) (*ricart.Empty, er
 			p.clients[req.Id].Reply(p.ctx, &p.idmsg)
 		}()
 	}
+
 	p.mutex.Unlock()
 	return &p.empty, nil
 }
@@ -181,8 +179,6 @@ func (p *peer) Reply(ctx context.Context, req *ricart.Id) (*ricart.Empty, error)
 		p.state = "HELD"
 		p.replies = 0
 		p.mutex.Unlock()
-		// this cannot deadlock if no-one is malicious. if however, someone calls reply when we havent requested it
-		// then this will cause issues, since program will not be awaiting on this channel
 		p.held <- true
 	} else {
 		p.mutex.Unlock()
@@ -199,7 +195,15 @@ func (p *peer) enter() {
 		if err != nil {
 			log.Printf("something went wrong with id %v\n", id)
 		}
-		log.Printf("Enter | Requested from %v\n", id)
+		//log.Printf("Enter | Requested from %v\n", id)
+	}
+}
+
+func max(a int32, b int32) int32 {
+	if a > b {
+		return a
+	} else {
+		return b
 	}
 }
 
@@ -217,6 +221,7 @@ func setLog(port int32) *os.File {
 	}
 	// print to both file and console
 	mw := io.MultiWriter(os.Stdout, f)
+	log.SetFlags(0)
 	log.SetOutput(mw)
 	return f
 }

@@ -3,7 +3,6 @@ module github.com/emjakobsen1/dsysmutex
 go 1.19
 
 require (
-	github.com/LocatedInSpace/Distributed-Mutual-Exclusion v0.0.0-20221114222912-b1451e67cacb
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
 )
