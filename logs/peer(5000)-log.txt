@@ -1,0 +1,32 @@
+Attempting dial: 5001
+Attempting dial: 5002
+Connected to all clients
+(5000, 1) Send | Seeking critical section access
+(5000, 3) Send | Seeking critical section access
+(5000, 4) Send | Allowing 5002 to enter critical section
+(5000, 6) Recv | Got reply from id 5002
+(5000, 7) Recv | Got reply from id 5001
+(5000, 8) Internal | Entered critical section
+(5000, 9) Recv | queueing request from 5001
+(5000, 10) Internal | Leaving critical section
+(5000, 11) Send | Seeking critical section access
+(5000, 12) Send | Allowing 5001 to enter critical section (queue release) 
+(5000, 13) Send | Seeking critical section access
+(5000, 15) Send | Allowing 5002 to enter critical section
+(5000, 19) Recv | Got reply from id 5001
+(5000, 20) Recv | Got reply from id 5002
+(5000, 21) Internal | Entered critical section
+(5000, 22) Recv | queueing request from 5001
+(5000, 23) Internal | Leaving critical section
+(5000, 24) Send | Seeking critical section access
+(5000, 25) Send | Allowing 5001 to enter critical section (queue release) 
+(5000, 26) Send | Seeking critical section access
+(5000, 29) Recv | Got reply from id 5001
+(5000, 32) Recv | Got reply from id 5002
+(5000, 33) Internal | Entered critical section
+(5000, 34) Send | Allowing 5002 to enter critical section
+(5000, 35) Internal | Leaving critical section
+(5000, 36) Send | Seeking critical section access
+(5000, 38) Send | Seeking critical section access
+(5000, 39) Send | Allowing 5001 to enter critical section
+(5000, 40) Recv | Got reply from id 5001
