@@ -1,0 +1,11 @@
+R1:
+The system contains of 3 peer nodes that emulates distributed mutual exclusion. They do so by implementing Ricard and Agrawala's algorithm. The system is written in golang and uses gRPC for message passing between peers. The purpose is to demonstrate peer nodes that write to a shared ressource, and the challenges that arise for peers to achieve exclusive rights to writing in a distributed setting. The system's Critical Section is represented as a file that the peers write to, which can be found in logs/cs-log.txt.
+
+Peers can at anytime decide that it wants to write to the Critical Section, in this setup they are repeatingly fighting for access rights. 
+
+R2:
+The system satifies safety because of how the algorithm works. If two peers enter the critical section at the same time, then both of these processes have replied to each other. This cannot happen because the pairs (p.Id, p.Lamport) are totally ordered. 
+
+The events are totally ordered because of the tiebreak on peer's id. If peer 1 grants access to peer 2, L(peer 2) < L(peer 1) and if .
+
+However 

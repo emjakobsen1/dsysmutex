@@ -1,13 +1,20 @@
-[2023-11-20 16:59:58] 5001 enters critical section.
-[2023-11-20 17:00:02] 5001 leaves critical section.
-[2023-11-20 17:00:02] 5000 enters critical section.
-[2023-11-20 17:00:04] 5000 leaves critical section.
-[2023-11-20 17:00:04] 5002 enters critical section.
-[2023-11-20 17:00:04] 5002 leaves critical section.
-[2023-11-20 17:00:05] 5002 enters critical section.
-[2023-11-20 17:00:08] 5002 leaves critical section.
-[2023-11-20 17:00:11] 5000 enters critical section.
-[2023-11-20 17:00:15] 5000 leaves critical section.
-[2023-11-20 17:00:15] 5001 enters critical section.
-[2023-11-20 17:00:19] 5001 leaves critical section.
-[2023-11-20 17:00:19] 5002 enters critical section.
+[2023-11-20 22:10:02] (Lamport: 5) 5002 enters critical section.
+[2023-11-20 22:10:06] (Lamport: 8) 5002 leaves critical section.
+[2023-11-20 22:10:06] (Lamport: 8) 5000 enters critical section.
+[2023-11-20 22:10:08] (Lamport: 13) 5000 leaves critical section.
+[2023-11-20 22:10:08] (Lamport: 14) 5001 enters critical section.
+[2023-11-20 22:10:11] (Lamport: 18) 5001 leaves critical section.
+[2023-11-20 22:10:11] (Lamport: 19) 5002 enters critical section.
+[2023-11-20 22:10:12] (Lamport: 23) 5002 leaves critical section.
+[2023-11-20 22:10:12] (Lamport: 24) 5000 enters critical section.
+[2023-11-20 22:10:15] (Lamport: 28) 5000 leaves critical section.
+[2023-11-20 22:10:15] (Lamport: 29) 5001 enters critical section.
+[2023-11-20 22:10:16] (Lamport: 33) 5001 leaves critical section.
+[2023-11-20 22:10:16] (Lamport: 34) 5002 enters critical section.
+[2023-11-20 22:10:19] (Lamport: 38) 5002 leaves critical section.
+[2023-11-20 22:10:19] (Lamport: 39) 5000 enters critical section.
+[2023-11-20 22:10:21] (Lamport: 43) 5000 leaves critical section.
+[2023-11-20 22:10:21] (Lamport: 44) 5001 enters critical section.
+[2023-11-20 22:10:21] (Lamport: 45) 5001 leaves critical section.
+[2023-11-20 22:10:21] (Lamport: 44) 5002 enters critical section.
+[2023-11-20 22:10:22] (Lamport: 49) 5002 leaves critical section.

@@ -25,13 +25,13 @@ type peer struct {
 	message.UnimplementedServiceServer
 	id      int32
 	mutex   sync.Mutex
-	replies int32
+	replies map[int32]bool
 	held    chan bool
 	state   string
 	lamport int32
-	// a slice
+	// a "queue"
 	queue []msg
-	// Update on this channel, when when messages should be dequeued
+	// Update on this channel, when messages should be dequeued
 	reply   chan bool
 	clients map[int32]message.ServiceClient
 	ctx     context.Context
@@ -47,12 +47,16 @@ func main() {
 	p := &peer{
 		id:      ownPort,
 		clients: make(map[int32]message.ServiceClient),
-		replies: 0,
+		replies: make(map[int32]bool),
 		held:    make(chan bool),
 		ctx:     ctx,
 		state:   "RELEASED",
 		lamport: 0,
 		reply:   make(chan bool),
+	}
+
+	for peer := range p.replies {
+		p.replies[peer] = false
 	}
 
 	// Create listener tcp on port ownPort
@@ -103,6 +107,7 @@ func main() {
 			p.mutex.Lock()
 			for _, msg := range p.queue {
 				p.lamport = max(msg.lamport, p.lamport) + 1
+				p.replies[msg.id] = false
 				log.Printf("(%v, %v) Send | Allowing %v to enter critical section (queue release) \n", p.id, p.lamport, msg.id)
 				p.clients[msg.id].Reply(p.ctx, &message.Info{Id: p.id})
 			}
@@ -113,8 +118,10 @@ func main() {
 	}()
 
 	rand.Seed(time.Now().UnixNano() / int64(ownPort))
-	for {
-		// 1/100 chance to want access
+
+	// This loop can be uncommented to illustrate 1/100 chance to want access. Instead of every peer spamming "wanted"
+	/*for {
+
 		if rand.Intn(100) == 1 {
 			p.mutex.Lock()
 			p.state = "WANTED"
@@ -124,17 +131,17 @@ func main() {
 			<-p.held
 			p.lamport++
 			log.Printf("(%v, %v) Internal | Enters critical section\n", p.id, p.lamport)
-			writeToFile(cs, p.id, "enters critical section.")
+			writeToFile(cs, p.id, p.lamport, "enters critical section.")
 			var random = rand.Intn(5)
 			time.Sleep(time.Duration(random) * time.Second)
 			p.lamport++
 			log.Printf("(%v, %v) Internal | Leaves critical section\n", p.id, p.lamport)
-			writeToFile(cs, p.id, "leaves critical section.")
+			writeToFile(cs, p.id, p.lamport, "leaves critical section.")
 			p.reply <- true
 			time.Sleep(100 * time.Millisecond)
 		}
 		time.Sleep(50 * time.Millisecond)
-	}
+	}*/
 
 	for {
 		p.mutex.Lock()
@@ -145,12 +152,12 @@ func main() {
 		<-p.held
 		p.lamport++
 		log.Printf("(%v, %v) Internal | Entered critical section\n", p.id, p.lamport)
-		writeToFile(cs, p.id, "enters critical section.")
+		writeToFile(cs, p.id, p.lamport, "enters critical section.")
 		var random = rand.Intn(5)
 		time.Sleep(time.Duration(random) * time.Second)
 		p.lamport++
 		log.Printf("(%v, %v) Internal | Leaving critical section\n", p.id, p.lamport)
-		writeToFile(cs, p.id, "leaves critical section.")
+		writeToFile(cs, p.id, p.lamport, "leaves critical section.")
 		p.reply <- true
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -170,9 +177,10 @@ func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, 
 		go func() {
 
 			p.mutex.Lock()
+			p.lamport = max(req.Lamport, p.lamport) + 1
 			time.Sleep(10 * time.Millisecond)
-			p.lamport++
-			p.replies = 0
+			//p.lamport++
+			p.replies[req.Id] = false
 			log.Printf("(%v, %v) Send | Allowing %v to enter critical section\n", p.id, p.lamport, req.Id)
 			p.clients[req.Id].Reply(p.ctx, &message.Info{Id: p.id, Lamport: p.lamport, State: p.state})
 			p.mutex.Unlock()
@@ -188,17 +196,21 @@ func (p *peer) Reply(ctx context.Context, req *message.Info) (*message.Empty, er
 	p.mutex.Lock()
 	p.lamport = max(p.lamport, req.Lamport) + 1
 	log.Printf("(%v, %v) Recv | Got reply from id %v\n", p.id, p.lamport, req.Id)
+	p.replies[req.Id] = true
 
 	// Added this check in case a the peer responded but that peer itself is in wanted state.
 	// For this case, the responding peer that won access enqueues the request and responds when it is done,
 	// since requests are only issued once the peer that lost will eventually get it when it is released from the queue.
-	if req.State == "WANTED" {
-		p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})
-	}
-	p.replies++
-	if p.replies >= 2 {
+
+	// if req.State == "WANTED" {
+	// 	p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})
+	// }
+
+	if allTrue(p.replies) {
 		p.state = "HELD"
-		p.replies = 0
+		for peer := range p.replies {
+			p.replies[peer] = false
+		}
 		p.mutex.Unlock()
 		p.held <- true
 	} else {
@@ -207,12 +219,21 @@ func (p *peer) Reply(ctx context.Context, req *message.Info) (*message.Empty, er
 	return &message.Empty{}, nil
 }
 
-func (p *peer) enter() {
+func allTrue(m map[int32]bool) bool {
+	for _, value := range m {
+		if !value {
+			return false
+		}
+	}
+	return true
+}
 
+func (p *peer) enter() {
+	p.lamport++
+	log.Printf("(%v, %v) Send | Seeking critical section access", p.id, p.lamport)
+	info := &message.Info{Id: p.id, Lamport: p.lamport, State: p.state}
 	for id, client := range p.clients {
-		p.lamport++
-		log.Printf("(%v, %v) Send | Seeking critical section access", p.id, p.lamport)
-		info := &message.Info{Id: p.id, Lamport: p.lamport, State: p.state}
+
 		_, err := client.Request(p.ctx, info)
 		if err != nil {
 			log.Printf("something went wrong with id %v\n", id)
@@ -228,9 +249,9 @@ func max(a int32, b int32) int32 {
 	}
 }
 
-func writeToFile(logFile *os.File, id int32, message string) {
+func writeToFile(logFile *os.File, id int32, lamport int32, message string) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
-	_, err := fmt.Fprintf(logFile, "[%s] %v %s\n", timestamp, id, message)
+	_, err := fmt.Fprintf(logFile, "[%s] (Lamport: %d) %v %s\n", timestamp, lamport, id, message)
 	if err != nil {
 		log.Printf("Failed to write to critical section log: %v", err)
 	}
