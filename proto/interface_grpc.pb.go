@@ -19,126 +19,126 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RicartAndAgrawala_Request_FullMethodName = "/proto.RicartAndAgrawala/Request"
-	RicartAndAgrawala_Reply_FullMethodName   = "/proto.RicartAndAgrawala/Reply"
+	Service_Request_FullMethodName = "/proto.Service/Request"
+	Service_Reply_FullMethodName   = "/proto.Service/Reply"
 )
 
-// RicartAndAgrawalaClient is the client API for RicartAndAgrawala service.
+// ServiceClient is the client API for Service service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type RicartAndAgrawalaClient interface {
+type ServiceClient interface {
 	Request(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Empty, error)
 	Reply(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error)
 }
 
-type ricartAndAgrawalaClient struct {
+type serviceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRicartAndAgrawalaClient(cc grpc.ClientConnInterface) RicartAndAgrawalaClient {
-	return &ricartAndAgrawalaClient{cc}
+func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
+	return &serviceClient{cc}
 }
 
-func (c *ricartAndAgrawalaClient) Request(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Empty, error) {
+func (c *serviceClient) Request(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, RicartAndAgrawala_Request_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Service_Request_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ricartAndAgrawalaClient) Reply(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error) {
+func (c *serviceClient) Reply(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, RicartAndAgrawala_Reply_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Service_Reply_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RicartAndAgrawalaServer is the server API for RicartAndAgrawala service.
-// All implementations must embed UnimplementedRicartAndAgrawalaServer
+// ServiceServer is the server API for Service service.
+// All implementations must embed UnimplementedServiceServer
 // for forward compatibility
-type RicartAndAgrawalaServer interface {
+type ServiceServer interface {
 	Request(context.Context, *Info) (*Empty, error)
 	Reply(context.Context, *Id) (*Empty, error)
-	mustEmbedUnimplementedRicartAndAgrawalaServer()
+	mustEmbedUnimplementedServiceServer()
 }
 
-// UnimplementedRicartAndAgrawalaServer must be embedded to have forward compatible implementations.
-type UnimplementedRicartAndAgrawalaServer struct {
+// UnimplementedServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedServiceServer struct {
 }
 
-func (UnimplementedRicartAndAgrawalaServer) Request(context.Context, *Info) (*Empty, error) {
+func (UnimplementedServiceServer) Request(context.Context, *Info) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Request not implemented")
 }
-func (UnimplementedRicartAndAgrawalaServer) Reply(context.Context, *Id) (*Empty, error) {
+func (UnimplementedServiceServer) Reply(context.Context, *Id) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Reply not implemented")
 }
-func (UnimplementedRicartAndAgrawalaServer) mustEmbedUnimplementedRicartAndAgrawalaServer() {}
+func (UnimplementedServiceServer) mustEmbedUnimplementedServiceServer() {}
 
-// UnsafeRicartAndAgrawalaServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to RicartAndAgrawalaServer will
+// UnsafeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ServiceServer will
 // result in compilation errors.
-type UnsafeRicartAndAgrawalaServer interface {
-	mustEmbedUnimplementedRicartAndAgrawalaServer()
+type UnsafeServiceServer interface {
+	mustEmbedUnimplementedServiceServer()
 }
 
-func RegisterRicartAndAgrawalaServer(s grpc.ServiceRegistrar, srv RicartAndAgrawalaServer) {
-	s.RegisterService(&RicartAndAgrawala_ServiceDesc, srv)
+func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
+	s.RegisterService(&Service_ServiceDesc, srv)
 }
 
-func _RicartAndAgrawala_Request_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_Request_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Info)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RicartAndAgrawalaServer).Request(ctx, in)
+		return srv.(ServiceServer).Request(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: RicartAndAgrawala_Request_FullMethodName,
+		FullMethod: Service_Request_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RicartAndAgrawalaServer).Request(ctx, req.(*Info))
+		return srv.(ServiceServer).Request(ctx, req.(*Info))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RicartAndAgrawala_Reply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_Reply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RicartAndAgrawalaServer).Reply(ctx, in)
+		return srv.(ServiceServer).Reply(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: RicartAndAgrawala_Reply_FullMethodName,
+		FullMethod: Service_Reply_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RicartAndAgrawalaServer).Reply(ctx, req.(*Id))
+		return srv.(ServiceServer).Reply(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// RicartAndAgrawala_ServiceDesc is the grpc.ServiceDesc for RicartAndAgrawala service.
+// Service_ServiceDesc is the grpc.ServiceDesc for Service service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var RicartAndAgrawala_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.RicartAndAgrawala",
-	HandlerType: (*RicartAndAgrawalaServer)(nil),
+var Service_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.Service",
+	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Request",
-			Handler:    _RicartAndAgrawala_Request_Handler,
+			Handler:    _Service_Request_Handler,
 		},
 		{
 			MethodName: "Reply",
-			Handler:    _RicartAndAgrawala_Reply_Handler,
+			Handler:    _Service_Reply_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

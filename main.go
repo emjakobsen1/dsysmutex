@@ -22,10 +22,10 @@ type msg struct {
 }
 
 type peer struct {
-	ricart.UnimplementedRicartAndAgrawalaServer
+	ricart.UnimplementedServiceServer
 	id      int32
 	mutex   sync.Mutex
-	replies uint8
+	replies int32
 	held    chan bool
 	state   string
 	lamport uint64
@@ -38,7 +38,7 @@ type peer struct {
 	queue []msg
 	// fire update on this channel, when we need to send messages in our queue
 	reply   chan bool
-	clients map[int32]ricart.RicartAndAgrawalaClient
+	clients map[int32]ricart.ServiceClient
 	ctx     context.Context
 }
 
@@ -51,7 +51,7 @@ func main() {
 
 	p := &peer{
 		id:      ownPort,
-		clients: make(map[int32]ricart.RicartAndAgrawalaClient),
+		clients: make(map[int32]ricart.ServiceClient),
 		replies: 0,
 		held:    make(chan bool),
 		ctx:     ctx,
@@ -72,7 +72,7 @@ func main() {
 	defer f.Close()
 
 	grpcServer := grpc.NewServer()
-	ricart.RegisterRicartAndAgrawalaServer(grpcServer, p)
+	ricart.RegisterServiceServer(grpcServer, p)
 
 	go func() {
 		if err := grpcServer.Serve(list); err != nil {
@@ -95,7 +95,7 @@ func main() {
 			log.Fatalf("Dial failed: %s", err)
 		}
 		defer conn.Close()
-		c := ricart.NewRicartAndAgrawalaClient(conn)
+		c := ricart.NewServiceClient(conn)
 		p.clients[port] = c
 	}
 
@@ -132,7 +132,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano() / int64(ownPort))
 	for {
 		// 1/100 chance
-		if rand.Intn(100) == 42 {
+		if rand.Intn(100) == 1 {
 			p.mutex.Lock()
 			p.state = "WANTED"
 			p.mutex.Unlock()
@@ -151,7 +151,6 @@ func main() {
 
 func (p *peer) Request(ctx context.Context, req *ricart.Info) (*ricart.Empty, error) {
 	p.mutex.Lock()
-	//if p.state == "HELD" || (p.state == "WANTED" && p.LessThan(req.Id, req.Lamport)) {
 	if p.state == "HELD" || (p.state == "WANTED" && ((p.lamport < req.Lamport) || (p.lamport == req.Lamport && p.id < req.Id))) {
 		log.Printf("Request | Received request from %v, appending...\n", req.Id)
 		p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})

@@ -1,19 +1,19 @@
-2023/11/20 10:44:41 Attempting dial: 5000
-2023/11/20 10:44:41 Attempting dial: 5001
-2023/11/20 10:44:41 Connected to all clients, sleeping 
-2023/11/20 10:44:47 Enter | Seeking critical section access
-2023/11/20 10:44:47 Enter | Requested from 5000
-2023/11/20 10:44:47 Enter | Requested from 5001
-2023/11/20 10:44:47 Reply | Got reply from id 5000
-2023/11/20 10:44:47 Reply | Got reply from id 5001
-2023/11/20 10:44:47 + Entered critical section
-2023/11/20 10:44:50 Request | Received request from 5000, appending...
-2023/11/20 10:44:52 - Leaving critical section
-2023/11/20 10:44:52 Queue | Giving permission to enter critical section to 5000
-2023/11/20 10:44:58 Request | Allowing 5001 to enter critical section
-2023/11/20 10:45:02 Enter | Seeking critical section access
-2023/11/20 10:45:02 Enter | Requested from 5001
-2023/11/20 10:45:02 Enter | Requested from 5000
-2023/11/20 10:45:02 Reply | Got reply from id 5000
-2023/11/20 10:45:03 Reply | Got reply from id 5001
-2023/11/20 10:45:03 + Entered critical section
+2023/11/20 11:19:22 Attempting dial: 5000
+2023/11/20 11:19:40 Attempting dial: 5001
+2023/11/20 11:19:40 Connected to all clients, sleeping 
+2023/11/20 11:19:45 Enter | Seeking critical section access
+2023/11/20 11:19:45 Enter | Requested from 5000
+2023/11/20 11:19:45 Enter | Requested from 5001
+2023/11/20 11:19:45 Reply | Got reply from id 5001
+2023/11/20 11:19:45 Reply | Got reply from id 5000
+2023/11/20 11:19:45 + Entered critical section
+2023/11/20 11:19:46 Request | Received request from 5000, appending...
+2023/11/20 11:19:50 - Leaving critical section
+2023/11/20 11:19:50 Queue | Giving permission to enter critical section to 5000
+2023/11/20 11:19:53 Enter | Seeking critical section access
+2023/11/20 11:19:53 Enter | Requested from 5000
+2023/11/20 11:19:53 Enter | Requested from 5001
+2023/11/20 11:19:53 Reply | Got reply from id 5001
+2023/11/20 11:19:55 Reply | Got reply from id 5000
+2023/11/20 11:19:55 + Entered critical section
+2023/11/20 11:19:56 Request | Received request from 5001, appending...
