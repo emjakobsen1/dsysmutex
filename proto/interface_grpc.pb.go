@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ServiceClient interface {
 	Request(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Empty, error)
-	Reply(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error)
+	Reply(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type serviceClient struct {
@@ -48,7 +48,7 @@ func (c *serviceClient) Request(ctx context.Context, in *Info, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *serviceClient) Reply(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error) {
+func (c *serviceClient) Reply(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, Service_Reply_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -62,7 +62,7 @@ func (c *serviceClient) Reply(ctx context.Context, in *Id, opts ...grpc.CallOpti
 // for forward compatibility
 type ServiceServer interface {
 	Request(context.Context, *Info) (*Empty, error)
-	Reply(context.Context, *Id) (*Empty, error)
+	Reply(context.Context, *Info) (*Empty, error)
 	mustEmbedUnimplementedServiceServer()
 }
 
@@ -73,7 +73,7 @@ type UnimplementedServiceServer struct {
 func (UnimplementedServiceServer) Request(context.Context, *Info) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Request not implemented")
 }
-func (UnimplementedServiceServer) Reply(context.Context, *Id) (*Empty, error) {
+func (UnimplementedServiceServer) Reply(context.Context, *Info) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Reply not implemented")
 }
 func (UnimplementedServiceServer) mustEmbedUnimplementedServiceServer() {}
@@ -108,7 +108,7 @@ func _Service_Request_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Service_Reply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Id)
+	in := new(Info)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func _Service_Reply_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: Service_Reply_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).Reply(ctx, req.(*Id))
+		return srv.(ServiceServer).Reply(ctx, req.(*Info))
 	}
 	return interceptor(ctx, in, info, handler)
 }

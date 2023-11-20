@@ -11,7 +11,7 @@ package proto;
 service Service
 {
     rpc Request(Info) returns (Empty);
-    rpc Reply(Id) returns (Empty);
+    rpc Reply(Info) returns (Empty);
 }
 
 message Info {
@@ -19,9 +19,6 @@ message Info {
     int32 lamport = 2;
 }
 
-message Id {
-    int32 id = 1;
-}
 
 message Empty {
     
