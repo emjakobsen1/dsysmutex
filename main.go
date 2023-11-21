@@ -135,12 +135,12 @@ func main() {
 			<-p.held
 			p.lamport++
 			log.Printf("(%v, %v) Internal | Enters critical section\n", p.id, p.lamport)
-			writeToFile(cs, p.id, p.lamport, "enters critical section.")
+			accessRessource(cs, p.id, p.lamport, "enters critical section.")
 			var random = rand.Intn(5)
 			time.Sleep(time.Duration(random) * time.Second)
 			p.lamport++
 			log.Printf("(%v, %v) Internal | Leaves critical section\n", p.id, p.lamport)
-			writeToFile(cs, p.id, p.lamport, "leaves critical section.")
+			accessRessource(cs, p.id, p.lamport, "leaves critical section.")
 			p.reply <- true
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -182,9 +182,7 @@ func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, 
 		go func() {
 
 			p.mutex.Lock()
-			//p.lamport = max(req.Lamport, p.lamport) + 1
 			time.Sleep(10 * time.Millisecond)
-			//p.lamport++
 			p.replies[req.Id] = false
 			log.Printf("(%v, %v) Send | Allowing %v to enter critical section\n", p.id, p.lamport, req.Id)
 			p.clients[req.Id].Reply(p.ctx, &message.Info{Id: p.id})
@@ -199,17 +197,8 @@ func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, 
 
 func (p *peer) Reply(ctx context.Context, req *message.Info) (*message.Empty, error) {
 	p.mutex.Lock()
-	//p.lamport = max(p.lamport, req.Lamport) + 1
 	log.Printf("(%v, %v) Recv | Got reply from id %v\n", p.id, p.lamport, req.Id)
 	p.replies[req.Id] = true
-
-	// Added this check in case a the peer responded but that peer itself is in wanted state.
-	// For this case, the responding peer that won access enqueues the request and responds when it is done,
-	//????     since requests are only issued once the peer that lost will eventually get it when it is released from the queue ???    ?
-
-	// if req.State == "WANTED" {
-	// 	p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})
-	// }
 
 	if allTrue(p.replies) {
 		p.state = "HELD"

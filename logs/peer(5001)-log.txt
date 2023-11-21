@@ -1,83 +1,24 @@
 Attempting dial: 5000
 Attempting dial: 5002
 Connected to all clients
-(5001, 1) Send | Allowing 5000 to enter critical section
-(5001, 2) Send | Allowing 5002 to enter critical section
-(5001, 3) Send | Seeking critical section access
-(5001, 3) Recv | Got reply from id 5000
-(5001, 6) Recv | queueing request from 5000
-(5001, 6) Recv | Got reply from id 5002
-(5001, 7) Internal | Entered critical section
-(5001, 8) Internal | Leaving critical section
-(5001, 8) Send | Allowing 5000 to enter critical section (queue release) 
+(5001, 1) Send | Allowing 5002 to enter critical section
+(5001, 5) Send | Allowing 5002 to enter critical section
+(5001, 9) Send | Allowing 5002 to enter critical section
 (5001, 10) Send | Seeking critical section access
-(5001, 10) Send | Allowing 5002 to enter critical section
 (5001, 10) Recv | Got reply from id 5000
-(5001, 13) Recv | queueing request from 5000
-(5001, 13) Recv | Got reply from id 5002
-(5001, 14) Internal | Entered critical section
-(5001, 16) Recv | queueing request from 5002
-(5001, 17) Internal | Leaving critical section
-(5001, 17) Send | Allowing 5000 to enter critical section (queue release) 
-(5001, 17) Send | Allowing 5002 to enter critical section (queue release) 
-(5001, 19) Send | Seeking critical section access
-(5001, 20) Recv | queueing request from 5000
+(5001, 10) Recv | Got reply from id 5002
+(5001, 11) Internal | Enters critical section
+(5001, 13) Recv | queueing request from 5002
+(5001, 14) Recv | queueing request from 5000
+(5001, 15) Internal | Leaves critical section
+(5001, 15) Send | Allowing 5002 to enter critical section (queue release) 
+(5001, 15) Send | Allowing 5000 to enter critical section (queue release) 
+(5001, 18) Send | Allowing 5000 to enter critical section
+(5001, 19) Send | Allowing 5002 to enter critical section
+(5001, 20) Send | Seeking critical section access
 (5001, 20) Recv | Got reply from id 5000
 (5001, 20) Recv | Got reply from id 5002
-(5001, 21) Internal | Entered critical section
-(5001, 23) Recv | queueing request from 5002
-(5001, 24) Internal | Leaving critical section
+(5001, 21) Internal | Enters critical section
+(5001, 23) Recv | queueing request from 5000
+(5001, 24) Internal | Leaves critical section
 (5001, 24) Send | Allowing 5000 to enter critical section (queue release) 
-(5001, 24) Send | Allowing 5002 to enter critical section (queue release) 
-(5001, 26) Send | Seeking critical section access
-(5001, 27) Recv | queueing request from 5000
-(5001, 27) Recv | Got reply from id 5000
-(5001, 27) Recv | Got reply from id 5002
-(5001, 28) Internal | Entered critical section
-(5001, 30) Recv | queueing request from 5002
-(5001, 31) Internal | Leaving critical section
-(5001, 31) Send | Allowing 5000 to enter critical section (queue release) 
-(5001, 31) Send | Allowing 5002 to enter critical section (queue release) 
-(5001, 33) Send | Seeking critical section access
-(5001, 33) Recv | Got reply from id 5000
-(5001, 36) Recv | queueing request from 5000
-(5001, 36) Recv | Got reply from id 5002
-(5001, 37) Internal | Entered critical section
-(5001, 38) Internal | Leaving critical section
-(5001, 38) Send | Allowing 5000 to enter critical section (queue release) 
-(5001, 40) Send | Seeking critical section access
-(5001, 40) Send | Allowing 5000 to enter critical section
-(5001, 40) Send | Allowing 5002 to enter critical section
-(5001, 40) Recv | Got reply from id 5002
-(5001, 44) Recv | queueing request from 5002
-(5001, 44) Recv | Got reply from id 5000
-(5001, 45) Internal | Entered critical section
-(5001, 47) Recv | queueing request from 5000
-(5001, 48) Internal | Leaving critical section
-(5001, 48) Send | Allowing 5002 to enter critical section (queue release) 
-(5001, 48) Send | Allowing 5000 to enter critical section (queue release) 
-(5001, 50) Send | Seeking critical section access
-(5001, 50) Recv | Got reply from id 5002
-(5001, 53) Recv | queueing request from 5002
-(5001, 53) Recv | Got reply from id 5000
-(5001, 54) Internal | Entered critical section
-(5001, 56) Recv | queueing request from 5000
-(5001, 57) Internal | Leaving critical section
-(5001, 57) Send | Allowing 5002 to enter critical section (queue release) 
-(5001, 57) Send | Allowing 5000 to enter critical section (queue release) 
-(5001, 59) Send | Seeking critical section access
-(5001, 59) Recv | Got reply from id 5002
-(5001, 62) Recv | queueing request from 5002
-(5001, 62) Recv | Got reply from id 5000
-(5001, 63) Internal | Entered critical section
-(5001, 65) Recv | queueing request from 5000
-(5001, 66) Internal | Leaving critical section
-(5001, 66) Send | Allowing 5002 to enter critical section (queue release) 
-(5001, 66) Send | Allowing 5000 to enter critical section (queue release) 
-(5001, 68) Send | Seeking critical section access
-(5001, 69) Recv | queueing request from 5002
-(5001, 69) Recv | Got reply from id 5002
-(5001, 69) Recv | Got reply from id 5000
-(5001, 70) Internal | Entered critical section
-(5001, 71) Internal | Leaving critical section
-(5001, 71) Send | Allowing 5002 to enter critical section (queue release) 
