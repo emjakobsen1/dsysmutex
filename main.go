@@ -175,7 +175,6 @@ func (p *peer) Request(ctx context.Context, req *message.Info) (*message.Empty, 
 	if p.state == "HELD" || (p.state == "WANTED" && ((p.last_Req < req.Lamport) || (p.last_Req == req.Lamport && p.id < req.Id))) {
 
 		log.Printf("(%v, %v) Recv | queueing request from %v\n", p.id, p.lamport, req.Id)
-		//p.lamport++
 		p.queue = append(p.queue, msg{id: req.Id, lamport: req.Lamport})
 	} else {
 
