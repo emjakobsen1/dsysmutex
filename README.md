@@ -1,5 +1,5 @@
 # Distributed-Mutual-Exclusion
-BSDISYS1KU-20222, mandatory handin 4
+Mandatory hand-in 4 for DSYS 2023
 
 ##  How to run
 
